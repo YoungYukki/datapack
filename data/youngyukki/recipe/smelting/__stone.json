@@ -8,11 +8,12 @@
     "minecraft:diorite",
     "minecraft:polished_andesite",
     "minecraft:polished_granite",
-    "minecraft:polished_diorite"
+    "minecraft:polished_diorite",
+    "minecraft:calcite"
   ],
   "result": {
     "id": "minecraft:stone"
   },
   "experience": 1,
-  "cookingtime": 100
+  "cookingtime": 200
 }
