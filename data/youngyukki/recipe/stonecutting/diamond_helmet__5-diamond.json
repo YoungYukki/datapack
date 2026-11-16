@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "group": "break",
+  "ingredient": "minecraft:diamond_helmet",
+  "result": {
+    "id": "minecraft:diamond",
+    "count": 5
+  }
+}
