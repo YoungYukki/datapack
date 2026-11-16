@@ -7,6 +7,8 @@ from collections import Counter
 import questionary
 import subprocess
 
+DEFALUT_PATH = r"D:\downloads\draft.json"
+
 GENERATORS = [
     "recipe",
 ]
@@ -31,7 +33,9 @@ def main():
 
 
 def recipe():
-    draft_path = pick_file()
+    if not Path(DEFALUT_PATH).exists():
+        draft_path = pick_file()
+    draft_path = DEFALUT_PATH
     if not draft_path:
         print("没有选择文件")
         return None
@@ -72,6 +76,7 @@ def recipe_copy(draft: dict, draft_path: str):
         return None
     shutil.copy(draft_path, recipe_path)
     commit(recipe_path, new_name)
+    Path(draft_path).unlink()
 
 
 def create_new_name(draft: dict) -> Path:
