@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:smelting",
+  "group": "trans",
+  "category": "blocks",
+  "ingredient": [
+    "minecraft:andesite",
+    "minecraft:granite",
+    "minecraft:diorite",
+    "minecraft:polished_andesite",
+    "minecraft:polished_granite",
+    "minecraft:polished_diorite"
+  ],
+  "result": {
+    "id": "minecraft:stone"
+  },
+  "experience": 1,
+  "cookingtime": 100
+}

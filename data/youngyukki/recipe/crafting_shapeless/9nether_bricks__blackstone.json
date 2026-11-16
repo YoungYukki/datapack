@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick",
+    "minecraft:nether_brick"
+  ],
+  "result": {
+    "id": "minecraft:blackstone",
+    "count": 1
+  }
+}

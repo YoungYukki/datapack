@@ -1,0 +1,14 @@
+{
+    "type": "minecraft:smelting",
+    "category": "blocks",
+    "ingredient": [
+        "minecraft:basalt",
+        "minecraft:tuff",
+        "minecraft:blackstone"
+    ],
+    "result": {
+        "id": "minecraft:cobbled_deepslate"
+    },
+    "experience": 1,
+    "cookingtime": 100
+}
