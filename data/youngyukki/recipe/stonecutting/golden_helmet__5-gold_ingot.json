@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "group": "break",
+  "ingredient": "minecraft:golden_helmet",
+  "result": {
+    "id": "minecraft:gold_ingot",
+    "count": 5
+  }
+}
