@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "merge",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:deepslate_brick_slab",
+    "minecraft:deepslate_brick_slab"
+  ],
+  "result": {
+    "id": "minecraft:deepslate_bricks",
+    "count": 1
+  }
+}
