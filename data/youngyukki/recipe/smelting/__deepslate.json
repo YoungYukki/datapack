@@ -3,7 +3,6 @@
   "category": "blocks",
   "ingredient": [
     "minecraft:smooth_basalt",
-    "minecraft:basalt",
     "minecraft:tuff",
     "minecraft:blackstone"
   ],
