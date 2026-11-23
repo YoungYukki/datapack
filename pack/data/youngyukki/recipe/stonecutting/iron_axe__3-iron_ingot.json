@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "group": "break",
+  "ingredient": "minecraft:iron_axe",
+  "result": {
+    "id": "minecraft:iron_ingot",
+    "count": 3
+  }
+}
