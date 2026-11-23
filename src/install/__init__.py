@@ -1,6 +1,6 @@
 import questionary
 from utils.store import STORE
-from install import recipe
+from install.recipe import main as recipe
 
 
 def main():
