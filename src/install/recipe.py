@@ -70,7 +70,7 @@ def copy(draft: dict, draft_path: str):
     if not STORE.DEFAULT.NAMESPACE:
         STORE.DEFAULT.update("namespace", namespace)
     # 配方目录
-    _type = draft.get("type")
+    _type = draft.get("type")[10:]
     recipe_path = data_path / namespace / "recipe" / _type / name
     console.info(f"{draft_path} => {recipe_path}")
     is_copy = questionary.confirm("确定移动?").ask()
