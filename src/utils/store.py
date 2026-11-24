@@ -1,30 +1,34 @@
 import yaml
 from pathlib import Path
 from utils import console
+from utils.io import (
+    read_yaml,
+    write_yaml,
+)
 
 
 class Default:
     PATH = "default.yaml"
-    DOWNLOAD_PATH = None
-    DATAPACK_PATH = None
-    _default = {}
+    DEFAULT_KEY = [
+        "download_directory",
+        "datapack_directory",
+        "namespace",
+    ]
 
     def __init__(self):
         if not Path(self.PATH).exists():
-            console.danger("默认配置文件不存在")
-            return None
-        with open(self.PATH, "r", encoding="utf-8") as f:
-            self._default = yaml.safe_load(f)
+            console.warning("默认配置文件不存在")
+            write_yaml(self.PATH, {key: "" for key in self.DEFAULT_KEY})
+        self._default: dict = read_yaml(self.PATH)
         self.DOWNLOAD_DIRECTORY = self._default.get("download_directory")
         self.DATAPACK_DIRECTORY = self._default.get("datapack_directory")
+        self.NAMESPACE = self._default.get("namespace")
 
     def update(self, key: str, value: str):
         if not key in self._default.keys():
-            console.danger("不存在的default键值")
-            return None
+            console.warning(f"不存在{key}")
         self._default.update({key: value})
-        with open(self.PATH, "w", encoding="utf-8") as f:
-            f.write(yaml.safe_dump(self._default))
+        write_yaml(self.PATH, self._default)
 
 
 class Stataic:

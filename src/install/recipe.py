@@ -1,8 +1,12 @@
-import json
+import questionary, shutil
 from pathlib import Path
 from utils.store import STORE
-from utils import (
+from utils.io import (
     pick_file,
+    pick_folder,
+    read_json,
+)
+from utils import (
     format_count,
     concat,
     console,
@@ -10,13 +14,16 @@ from utils import (
 
 
 def main():
-    if not STORE.DEFAULT.DOWNLOAD_PATH:
-        console.warning("默认下载地址不存在")
-        draft_path = pick_file()
-        STORE.DEFAULT.update("download_directory", Path(draft_path).parent)
+    draft_path = pick_file(STORE.DEFAULT.DOWNLOAD_DIRECTORY)
     if not draft_path:
         console.danger("没有选择文件")
         return None
+    if not STORE.DEFAULT.DOWNLOAD_DIRECTORY:
+        console.warning("默认DOWNLOAD_DIRECTORY不存在")
+        STORE.DEFAULT.update(
+            "download_directory",
+            str(Path(draft_path).parent),
+        )
     draft = read_draft(draft_path)
     if not draft:
         return None
@@ -24,8 +31,7 @@ def main():
 
 
 def read_draft(path: str) -> dict | None:
-    with open(path, "r", encoding="utf-8") as f:
-        draft: dict = json.load(f)
+    draft: dict = read_json(path)
     if not "type" in draft.keys():
         console.danger("没有<type>键")
         return dict()
@@ -37,23 +43,44 @@ def read_draft(path: str) -> dict | None:
 
 
 def copy(draft: dict, draft_path: str):
-    new_name = build_new_name(draft)
-    console.info(new_name)
+    # 新建文件名
+    name = build_name(draft)
+    if not name:
+        return None
+    # 获取数据包目录;如果默认目录不存在,就设置默认目录
+    datapack_directory = pick_folder(STORE.DEFAULT.DATAPACK_DIRECTORY)
+    if not STORE.DEFAULT.DATAPACK_DIRECTORY:
+        console.info("默认DATAPACK_DIRECTORY不存在")
+        STORE.DEFAULT.update(
+            "datapack_directory",
+            datapack_directory,
+        )
+    data_path = Path(datapack_directory) / "data"
+    mcmeta = Path(datapack_directory) / "pack.mcmeta"
+    if not mcmeta.exists():
+        console.danger(f"{data_path}不是数据包")
+        return None
+    # 选择namespace;如果默认namespace在选项里面就抬到首位;如果没有设置namespace就设置默认选项
+    namespaces = [namespace.name for namespace in data_path.glob("*")]
+    if STORE.DEFAULT.NAMESPACE in namespaces:
+        namespaces.remove(STORE.DEFAULT.NAMESPACE)
+        namespaces.insert(0, STORE.DEFAULT.NAMESPACE)
+    namespace = questionary.select("选择namespce", choices=namespaces).ask()
+    console.info(namespace)
+    if not STORE.DEFAULT.NAMESPACE:
+        STORE.DEFAULT.update("namespace", namespace)
+    # 配方目录
+    _type = draft.get("type")
+    recipe_path = data_path / namespace / "recipe" / _type / name
+    console.info(f"{draft_path} => {recipe_path}")
+    is_copy = questionary.confirm("确定移动?").ask()
+    if not is_copy:
+        console.warning("取消移动")
+        return None
+    shutil.move(draft_path, recipe_path)
 
-    # data_path = Path("data")
-    # namespaces = [namespace.name for namespace in data_path.glob("*")]
-    # namespace = questionary.select("选择namespace", choices=namespaces).ask()
-    # recipe_path: Path = data_path / namespace / "recipe" / _type / new_name
-    # print(f"{draft_path} => {recipe_path}")
-    # is_copy = questionary.confirm("确定复制?").ask()
-    # if not is_copy:
-    #     return None
-    # shutil.copy(draft_path, recipe_path)
-    # commit(recipe_path, new_name)
-    # Path(draft_path).unlink()
 
-
-def build_new_name(draft: dict) -> str:
+def build_name(draft: dict) -> str:
     _type = draft.get("type")
     if _type in STORE.STATIC.INGREDIENT:
         ingredient = draft.get("ingredient")
@@ -63,12 +90,15 @@ def build_new_name(draft: dict) -> str:
         leading_part = ingredients_part(ingredients)
     else:
         console.danger("未知的类型")
+        return str()
     result = draft.get("result")
     return f"{leading_part}={result_part(result)}.json"
 
 
 def ingredients_part(ingredients: list) -> str:
-    return concat("+", [ingredient_part(ingredient) for ingredient in ingredients])
+    return concat(
+        "+", [f"[{ingredient_part(ingredient)}]" for ingredient in ingredients]
+    )
 
 
 def ingredient_part(ingredient: list | str) -> str:
@@ -85,4 +115,4 @@ def result_part(result: dict | str) -> str:
         _count = result.get("count")
     else:
         _count = ""
-    return f"{format_count(_count)}{_id[10:]}"
+    return f"{format_count(_count)}[{_id[10:]}]"
