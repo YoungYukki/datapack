@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "show_notification": true,
+  "ingredient": "minecraft:netherite_axe",
+  "result": {
+    "id": "minecraft:netherite_ingot",
+    "count": 1
+  }
+}
