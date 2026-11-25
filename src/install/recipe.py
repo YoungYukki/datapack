@@ -2,35 +2,23 @@ import questionary, shutil
 from pathlib import Path
 from utils.store import STORE
 from utils.io import (
-    pick_file,
-    pick_folder,
     read_json,
 )
 from utils import (
+    console,
     format_count,
     concat,
     cut_minecraft,
-    console,
+    pick_datapack,
+    pick_draft,
 )
 
 
 def main():
-    # 选择draft文件位置;如果没有默认下载地址就更新;
-    draft_path = pick_file(STORE.DEFAULT.DOWNLOAD_DIRECTORY)
-    if not draft_path:
-        console.danger("没有选择文件")
-        return None
-    if not STORE.DEFAULT.DOWNLOAD_DIRECTORY:
-        console.warning("默认DOWNLOAD_DIRECTORY不存在")
-        STORE.DEFAULT.update(
-            "download_directory",
-            str(Path(draft_path).parent),
-        )
-    data_path = Path('pack') / "data"
-    mcmeta = Path('pack') / "pack.mcmeta"
-    if not mcmeta.exists():
-        console.danger(f"{data_path}不是数据包")
-        return None
+    draft_path = pick_draft()
+    datapack_directory = pick_datapack()
+    data_path = Path("pack") / "data"
+    datapack_data_path = datapack_directory / "data"
     # 选择namespace;如果默认namespace在选项里面就抬到首位;如果没有设置namespace就设置默认选项
     namespaces = [namespace.name for namespace in data_path.glob("*")]
     if STORE.DEFAULT.NAMESPACE in namespaces:
@@ -42,7 +30,12 @@ def main():
         STORE.DEFAULT.update("namespace", namespace)
     # 配方出目录
     recipe_dir = data_path / namespace / "recipe"
-    copy(draft_path, recipe_dir)
+    if not copy(draft_path, recipe_dir):
+        return None
+    datapack_recipe_dir = datapack_data_path / namespace / "recipe"
+    if not copy(draft_path, datapack_recipe_dir):
+        return None
+    Path(draft_path).unlink()
 
 
 def read_draft(path: str) -> dict | None:
@@ -66,16 +59,20 @@ def copy(draft_path: str, recipe_dir: Path):
     name = build_name(draft)
     if not name:
         return None
-    recipe_path = recipe_dir / draft.get("type")[10:] / name
+    recipe_path: Path = recipe_dir / draft.get("type")[10:] / name
     console.info(f"{draft_path} => {recipe_path}")
-    if draft_path == recipe_path:
-        console.warning("文件地址一样")
+    if recipe_path.exists():
+        console.danger("已经存在")
         return None
     is_copy = questionary.confirm("确定移动?").ask()
     if not is_copy:
-        console.warning("取消移动")
+        console.danger("取消移动")
         return None
-    shutil.move(draft_path, recipe_path)
+    shutil.copy(draft_path, recipe_path)
+    if not recipe_path.exists():
+        console.danger("复制失败")
+        return None
+    console.success("复制成功")
 
 
 def build_name(draft: dict) -> str:

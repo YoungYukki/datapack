@@ -1,6 +1,8 @@
 import questionary
-from install import main as install
-from utils.sync import main as sync
+from install import (
+    datapack_install,
+    datapack_sync,
+)
 from batch import main as batch
 from utils import console
 
@@ -13,9 +15,9 @@ FUNCTIONS = [
 func = questionary.select("选择一项功能:", choices=FUNCTIONS).ask()
 match func:
     case "install":
-        install()
+        datapack_install()
     case "sync":
-        sync()
+        datapack_sync()
     case "batch":
         batch()
     case _:
