@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "show_notification": true,
+  "ingredient": "minecraft:amethyst_cluster",
+  "result": {
+    "id": "minecraft:amethyst_shard",
+    "count": 2
+  }
+}

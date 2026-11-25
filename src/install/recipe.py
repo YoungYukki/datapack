@@ -26,7 +26,6 @@ def main():
         namespaces.remove(STORE.DEFAULT.NAMESPACE)
         namespaces.insert(0, STORE.DEFAULT.NAMESPACE)
     namespace = questionary.select("选择namespce", choices=namespaces).ask()
-    console.info(namespace)
     if not STORE.DEFAULT.NAMESPACE:
         STORE.DEFAULT.update("namespace", namespace)
     # 配方出目录
@@ -66,7 +65,7 @@ def copy(draft_path: Path, recipe_dir: Path):
     if recipe_path.exists():
         console.danger("已经存在")
         return None
-    is_copy = questionary.confirm("确定移动?").ask()
+    is_copy = questionary.confirm("确定复制?").ask()
     if not is_copy:
         console.danger("取消移动")
         return None
@@ -75,6 +74,7 @@ def copy(draft_path: Path, recipe_dir: Path):
         console.danger("复制失败")
         return None
     console.success("复制成功")
+    return True
 
 
 def build_name(draft: dict) -> str:
