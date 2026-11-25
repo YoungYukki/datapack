@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "show_notification": true,
+  "ingredient": "minecraft:diamond_leggings",
+  "result": {
+    "id": "minecraft:diamond",
+    "count": 7
+  }
+}

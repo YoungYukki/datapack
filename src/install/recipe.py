@@ -64,6 +64,7 @@ def copy(draft_path: Path, recipe_dir: Path):
     console.info(f"{draft_path} => {recipe_path}")
     if recipe_path.exists():
         console.danger("已经存在")
+        draft_path.unlink()
         return None
     is_copy = questionary.confirm("确定复制?").ask()
     if not is_copy:
