@@ -36,11 +36,11 @@ def main():
     datapack_recipe_dir = datapack_data_path / namespace / "recipe"
     if not copy(draft_path, datapack_recipe_dir):
         return None
+    draft_path.unlink()
     commit(recipe_dir.name)
-    Path(draft_path).unlink()
 
 
-def read_draft(path: str) -> dict | None:
+def read_draft(path: Path) -> dict | None:
     draft: dict = read_json(path)
     if not "type" in draft.keys():
         console.danger("没有<type>键")
@@ -52,7 +52,7 @@ def read_draft(path: str) -> dict | None:
     return draft
 
 
-def copy(draft_path: str, recipe_dir: Path):
+def copy(draft_path: Path, recipe_dir: Path):
     # 读取draft
     draft = read_draft(draft_path)
     if not draft:
@@ -89,17 +89,19 @@ def build_name(draft: dict) -> str:
         console.danger("未知的类型")
         return str()
     result = draft.get("result")
-    return f"{leading_part}={result_part(result)}.json"
+    return f"{leading_part}___to___{result_part(result)}.json"
 
 
 def ingredients_part(ingredients: list) -> str:
-    return concat("+", [f"{ingredient_part(ingredient)}" for ingredient in ingredients])
+    return concat(
+        "__and__", [f"{ingredient_part(ingredient)}" for ingredient in ingredients]
+    )
 
 
 def ingredient_part(ingredient: list | str) -> str:
     if isinstance(ingredient, str):
-        return f"[{cut_minecraft(ingredient)}]"
-    return f'[{concat("~", ingredient)}]'
+        return cut_minecraft(ingredient)
+    return concat("__or__", ingredient)
 
 
 def result_part(result: dict | str) -> str:
@@ -110,4 +112,4 @@ def result_part(result: dict | str) -> str:
         _count = result.get("count")
     else:
         _count = ""
-    return f"{format_count(_count)}[{cut_minecraft(_id)}]"
+    return format_count(_count) + cut_minecraft(_id)
