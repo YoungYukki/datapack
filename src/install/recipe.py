@@ -12,6 +12,7 @@ from utils import (
     pick_datapack,
     pick_draft,
 )
+from utils.commit import main as commit
 
 
 def main():
@@ -29,12 +30,13 @@ def main():
     if not STORE.DEFAULT.NAMESPACE:
         STORE.DEFAULT.update("namespace", namespace)
     # 配方出目录
-    recipe_dir = data_path / namespace / "recipe"
+    recipe_dir: Path = data_path / namespace / "recipe"
     if not copy(draft_path, recipe_dir):
         return None
     datapack_recipe_dir = datapack_data_path / namespace / "recipe"
     if not copy(draft_path, datapack_recipe_dir):
         return None
+    commit(recipe_dir.name)
     Path(draft_path).unlink()
 
 

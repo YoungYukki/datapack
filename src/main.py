@@ -4,7 +4,6 @@ from install import (
     datapack_sync,
 )
 from batch import main as batch
-from utils import console
 
 FUNCTIONS = [
     "install",
