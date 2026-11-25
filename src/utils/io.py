@@ -20,7 +20,7 @@ def read_json(path: str | Path):
         return json.load(f)
 
 
-def pick_file(initialdir: str, title="选择文件", types=[("所有文件", "*.*")]):
+def pick_file(initialdir: str = None, title="选择文件", types=[("所有文件", "*.*")]):
     if not initialdir:
         initialdir = Path.home()
     tk.Tk().withdraw()
@@ -31,7 +31,7 @@ def pick_file(initialdir: str, title="选择文件", types=[("所有文件", "*.
     )
 
 
-def pick_folder(initialdir: str, title="选择文件夹"):
+def pick_folder(initialdir: str = None, title="选择文件夹"):
     if not initialdir:
         initialdir = Path.home()
     tk.Tk().withdraw()

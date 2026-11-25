@@ -26,16 +26,8 @@ def main():
             "download_directory",
             str(Path(draft_path).parent),
         )
-    # 获取数据包目录;如果默认目录不存在,就设置默认目录
-    datapack_directory = pick_folder(STORE.DEFAULT.DATAPACK_DIRECTORY)
-    if not STORE.DEFAULT.DATAPACK_DIRECTORY:
-        console.info("默认DATAPACK_DIRECTORY不存在")
-        STORE.DEFAULT.update(
-            "datapack_directory",
-            datapack_directory,
-        )
-    data_path = Path(datapack_directory) / "data"
-    mcmeta = Path(datapack_directory) / "pack.mcmeta"
+    data_path = Path('pack') / "data"
+    mcmeta = Path('pack') / "pack.mcmeta"
     if not mcmeta.exists():
         console.danger(f"{data_path}不是数据包")
         return None

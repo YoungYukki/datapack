@@ -1,6 +1,8 @@
 from install.recipe import copy
 from pathlib import Path
 
+def main():
+    pass
 
 def recipe():
     work_directory = Path(
