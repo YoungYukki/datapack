@@ -9,11 +9,13 @@ from utils.io import (
 from utils import (
     format_count,
     concat,
+    cut_minecraft,
     console,
 )
 
 
 def main():
+    # 选择draft文件位置;如果没有默认下载地址就更新;
     draft_path = pick_file(STORE.DEFAULT.DOWNLOAD_DIRECTORY)
     if not draft_path:
         console.danger("没有选择文件")
@@ -24,29 +26,6 @@ def main():
             "download_directory",
             str(Path(draft_path).parent),
         )
-    draft = read_draft(draft_path)
-    if not draft:
-        return None
-    copy(draft, draft_path)
-
-
-def read_draft(path: str) -> dict | None:
-    draft: dict = read_json(path)
-    if not "type" in draft.keys():
-        console.danger("没有<type>键")
-        return dict()
-    _type = draft.get("type")
-    if not _type in STORE.STATIC.RECIPES:
-        console.danger("没有此配方生成器类型")
-        return dict()
-    return draft
-
-
-def copy(draft: dict, draft_path: str):
-    # 新建文件名
-    name = build_name(draft)
-    if not name:
-        return None
     # 获取数据包目录;如果默认目录不存在,就设置默认目录
     datapack_directory = pick_folder(STORE.DEFAULT.DATAPACK_DIRECTORY)
     if not STORE.DEFAULT.DATAPACK_DIRECTORY:
@@ -69,10 +48,37 @@ def copy(draft: dict, draft_path: str):
     console.info(namespace)
     if not STORE.DEFAULT.NAMESPACE:
         STORE.DEFAULT.update("namespace", namespace)
-    # 配方目录
-    _type = draft.get("type")[10:]
-    recipe_path = data_path / namespace / "recipe" / _type / name
+    # 配方出目录
+    recipe_dir = data_path / namespace / "recipe"
+    copy(draft_path, recipe_dir)
+
+
+def read_draft(path: str) -> dict | None:
+    draft: dict = read_json(path)
+    if not "type" in draft.keys():
+        console.danger("没有<type>键")
+        return dict()
+    _type = draft.get("type")
+    if not _type in STORE.STATIC.RECIPES:
+        console.danger("没有此配方生成器类型")
+        return dict()
+    return draft
+
+
+def copy(draft_path: str, recipe_dir: Path):
+    # 读取draft
+    draft = read_draft(draft_path)
+    if not draft:
+        return None
+    # 新建文件名
+    name = build_name(draft)
+    if not name:
+        return None
+    recipe_path = recipe_dir / draft.get("type")[10:] / name
     console.info(f"{draft_path} => {recipe_path}")
+    if draft_path == recipe_path:
+        console.warning("文件地址一样")
+        return None
     is_copy = questionary.confirm("确定移动?").ask()
     if not is_copy:
         console.warning("取消移动")
@@ -96,15 +102,13 @@ def build_name(draft: dict) -> str:
 
 
 def ingredients_part(ingredients: list) -> str:
-    return concat(
-        "+", [f"[{ingredient_part(ingredient)}]" for ingredient in ingredients]
-    )
+    return concat("+", [f"{ingredient_part(ingredient)}" for ingredient in ingredients])
 
 
 def ingredient_part(ingredient: list | str) -> str:
     if isinstance(ingredient, str):
-        return ingredient[10:]
-    return concat("~", ingredient)
+        return f"[{cut_minecraft(ingredient)}]"
+    return f'[{concat("~", ingredient)}]'
 
 
 def result_part(result: dict | str) -> str:
@@ -115,4 +119,4 @@ def result_part(result: dict | str) -> str:
         _count = result.get("count")
     else:
         _count = ""
-    return f"{format_count(_count)}[{_id[10:]}]"
+    return f"{format_count(_count)}[{cut_minecraft(_id)}]"
